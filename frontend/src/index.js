@@ -4,6 +4,7 @@ import { BrowserRouter as Router } from "react-router-dom"; // Solo un Router aq
 import App from "./App";
 import "./index.css";
 
+
 const Root = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
     !!localStorage.getItem("token")

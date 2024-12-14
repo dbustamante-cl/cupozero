@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 
 function Sidebar({ selectedAccount, setSelectedAccount, setShowCardAdmin, storesUpdated }) {
-  const [openMenu, setOpenMenu] = useState(null);
-  const [activeStores, setActiveStores] = useState([]); // Almacena las tiendas activas del usuario
-
-  const userId = localStorage.getItem("user_id"); // Obtiene el ID del usuario desde localStorage
+  const [isCollapsed, setIsCollapsed] = useState(false); // Estado para colapsar el menú
+  const [openMenu, setOpenMenu] = useState(null); // Controla el menú abierto
+  const [activeStores, setActiveStores] = useState([]); // Lista de tiendas activas
+  const userId = localStorage.getItem("user_id");
 
   useEffect(() => {
     if (!userId) {
@@ -14,124 +14,177 @@ function Sidebar({ selectedAccount, setSelectedAccount, setShowCardAdmin, stores
 
     const fetchActiveStores = async () => {
       try {
-        // Llamada al backend para obtener las tiendas activas
         const response = await fetch(`http://localhost:3000/api/stores?user_id=${userId}`);
-        if (!response.ok) {
-          throw new Error(`Error en la solicitud: ${response.status}`);
-        }
-
+        if (!response.ok) throw new Error(`Error en la solicitud: ${response.status}`);
         const allStores = await response.json();
-        if (!Array.isArray(allStores)) {
-          throw new Error("Respuesta del servidor no válida. Se esperaba un array.");
-        }
-
-        // Filtra las tiendas activas
         const filteredStores = allStores.filter(
           (store) => store.status === true || store.status === "true"
         );
-
-        setActiveStores(filteredStores); // Guarda las tiendas activas en el estado
-        console.log("Tiendas activas cargadas:", filteredStores);
+        setActiveStores(filteredStores);
       } catch (error) {
         console.error("Error al cargar las tiendas activas del usuario:", error);
-        setActiveStores([]); // En caso de error, establece una lista vacía
+        setActiveStores([]);
       }
     };
 
     fetchActiveStores();
-  }, [userId, storesUpdated]); // Refresca cuando se actualizan las tiendas o el usuario
+  }, [userId, storesUpdated]);
 
   const toggleMenu = (menuName) => {
     setOpenMenu((prevMenu) => (prevMenu === menuName ? null : menuName));
   };
 
+  // Lógica para expandir el menú si está colapsado y el usuario selecciona algo
+  const handleItemClick = (callback) => {
+    if (isCollapsed) {
+      setIsCollapsed(false); // Expande el menú si está colapsado
+    }
+    if (callback) callback(); // Ejecuta cualquier lógica asociada al clic
+  };
+
   return (
-    <div className="w-64 bg-blue-900 text-white flex flex-col">
-      <div className="p-4 font-bold text-xl">ControlCard</div>
+    <div
+      className={`h-full ${
+        isCollapsed ? "w-16" : "w-64"
+      } bg-gray-50 text-gray-800 border-r border-gray-200 shadow-lg flex flex-col transition-all duration-300`}
+    >
+      {/* Header */}
+      <div className="p-4 font-bold text-xl flex items-center justify-between">
+        {!isCollapsed && (
+          <div className="rounded-full bg-gray-800 w-10 h-10 flex items-center justify-center text-white">
+            cZ
+          </div>
+        )}
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="text-gray-400 hover:text-gray-600"
+        >
+          <span className="material-icons">
+            {isCollapsed ? "chevron_right" : "chevron_left"}
+          </span>
+        </button>
+      </div>
+
+      {/* Navigation */}
       <nav className="flex-1">
-        <ul>
+        <ul className="space-y-1">
           {/* Resumen */}
           <li>
             <button
-              onClick={() => {
+              onClick={() => handleItemClick(() => {
                 setSelectedAccount(null);
-                setShowCardAdmin(false); // Asegura que el Administrador de Tarjetas no esté activo
-              }}
-              className="w-full text-left px-4 py-2 hover:bg-gray-200"
+                setShowCardAdmin(false);
+              })}
+              className={`w-full px-4 py-3 text-left flex items-center rounded-lg ${
+                !openMenu && !selectedAccount ? "bg-gray-100" : "hover:bg-gray-100"
+              }`}
             >
-              Resumen
+              <span className="material-icons mr-3 text-gray-600">dashboard</span>
+              {!isCollapsed && "Dashboard"}
             </button>
           </li>
 
           {/* Cuentas */}
-          <li
-            className="p-4 hover:bg-blue-700 cursor-pointer flex justify-between items-center"
-            onClick={() => toggleMenu("Cuentas")}
-          >
-            Cuentas
-            <span>{openMenu === "Cuentas" ? "−" : "+"}</span>
+          <li>
+            <div
+              className={`px-4 py-3 flex justify-between items-center cursor-pointer rounded-lg ${
+                openMenu === "Cuentas" ? "bg-gray-100" : "hover:bg-gray-100"
+              }`}
+              onClick={() => handleItemClick(() => toggleMenu("Cuentas"))}
+            >
+              <div className="flex items-center">
+                <span className="material-icons mr-3 text-gray-600">account_balance_wallet</span>
+                {!isCollapsed && "Cuentas"}
+              </div>
+              {!isCollapsed && (
+                <span className="text-gray-600">{openMenu === "Cuentas" ? "−" : "+"}</span>
+              )}
+            </div>
+            {openMenu === "Cuentas" && !isCollapsed && (
+              <ul className="pl-6">
+                {activeStores.map((store, index) => (
+                  <li
+                    key={store.user_store_id || index}
+                    className={`py-2 hover:bg-gray-100 cursor-pointer rounded-lg ${
+                      selectedAccount?.user_store_id === store.user_store_id
+                        ? "bg-gray-200"
+                        : ""
+                    }`}
+                    onClick={() => handleItemClick(() => {
+                      setSelectedAccount(store);
+                      setShowCardAdmin(false);
+                    })}
+                  >
+                    {store.name}
+                  </li>
+                ))}
+              </ul>
+            )}
           </li>
-
-          {/* Lista de tiendas activas */}
-          {openMenu === "Cuentas" && (
-            <ul className="pl-6">
-              {activeStores.map((store, index) => (
-                <li
-                  key={store.user_store_id || index} // Clave única
-                  className={`p-2 hover:bg-blue-700 cursor-pointer ${
-                    selectedAccount?.user_store_id === store.user_store_id ? "bg-blue-700" : ""
-                  }`}
-                  onClick={() => {
-                    console.log("Tienda seleccionada:", store); // Registro de depuración
-                    setSelectedAccount(store); // Actualiza la tienda seleccionada
-                    setShowCardAdmin(false); // Asegura que no esté activo el Administrador de Tarjetas
-                  }}
-                  style={{ backgroundColor: store.color_code || "#ffffff" }} // Fallback a blanco si no hay `color_code`
-                >
-                  {store.name}
-                </li>
-              ))}
-            </ul>
-          )}
 
           {/* Configuración */}
-          <li
-            className="p-4 hover:bg-blue-700 cursor-pointer flex justify-between items-center"
-            onClick={() => toggleMenu("Configuración")}
-          >
-            Configuración
-            <span>{openMenu === "Configuración" ? "−" : "+"}</span>
+          <li>
+            <div
+              className={`px-4 py-3 flex justify-between items-center cursor-pointer rounded-lg ${
+                openMenu === "Configuración" ? "bg-gray-100" : "hover:bg-gray-100"
+              }`}
+              onClick={() => handleItemClick(() => toggleMenu("Configuración"))}
+            >
+              <div className="flex items-center">
+                <span className="material-icons mr-3 text-gray-600">settings</span>
+                {!isCollapsed && "Configuración"}
+              </div>
+              {!isCollapsed && (
+                <span className="text-gray-600">{openMenu === "Configuración" ? "−" : "+"}</span>
+              )}
+            </div>
+            {openMenu === "Configuración" && !isCollapsed && (
+              <ul className="pl-6">
+                <li
+                  className="py-2 hover:bg-gray-100 cursor-pointer rounded-lg"
+                  onClick={() => handleItemClick(() => {
+                    setShowCardAdmin(true);
+                    setSelectedAccount(null);
+                  })}
+                >
+                  Administrador de Tarjetas
+                </li>
+                <li className="py-2 hover:bg-gray-100 cursor-pointer rounded-lg">
+                  Otras Configuraciones
+                </li>
+              </ul>
+            )}
           </li>
 
-          {openMenu === "Configuración" && (
-            <ul className="pl-6">
-              <li
-                className="p-2 hover:bg-blue-700 cursor-pointer"
-                onClick={() => {
-                  setShowCardAdmin(true); // Activa el Administrador de Tarjetas
-                  setSelectedAccount(null); // Deselecciona cualquier cuenta
-                }}
-              >
-                Administrador de Tarjetas
-              </li>
-              <li className="p-2 hover:bg-blue-700 cursor-pointer">
-                Otras Configuraciones
-              </li>
-            </ul>
-          )}
-
           {/* Reportes */}
-          <li className="p-4 hover:bg-blue-700 cursor-pointer">Reportes</li>
+          <li>
+            <button
+              onClick={() => handleItemClick(() => {})}
+              className={`w-full px-4 py-3 text-left flex items-center rounded-lg ${
+                !openMenu && selectedAccount?.type === "Reportes" ? "bg-gray-100" : "hover:bg-gray-100"
+              }`}
+            >
+              <span className="material-icons mr-3 text-gray-600">bar_chart</span>
+              {!isCollapsed && "Reportes"}
+            </button>
+          </li>
         </ul>
       </nav>
+
+      {/* Footer */}
       <div
-        className="p-4 border-t border-blue-700 cursor-pointer hover:bg-blue-700"
+        className={`p-4 border-t border-gray-200 text-gray-600 hover:bg-gray-100 cursor-pointer rounded-lg ${
+          isCollapsed ? "justify-center" : ""
+        }`}
         onClick={() => {
-          localStorage.removeItem("token"); // Cierra sesión
-          window.location.reload(); // Recarga la página
+          localStorage.removeItem("token");
+          window.location.reload();
         }}
       >
-        Cerrar sesión
+        <span className="flex items-center">
+          <span className="material-icons mr-2">logout</span>
+          {!isCollapsed && "Cerrar sesión"}
+        </span>
       </div>
     </div>
   );
