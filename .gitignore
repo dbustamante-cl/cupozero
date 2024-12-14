@@ -1,0 +1,16 @@
+# Node.js
+node_modules/
+
+# Logs
+*.log
+logs/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Configuración de entorno
+.env
+
+# Build files
+frontend/build/
