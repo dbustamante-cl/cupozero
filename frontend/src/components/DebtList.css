@@ -1,0 +1,111 @@
+.debt-list {
+    margin-top: 20px;
+  }
+  
+  .debt-list label {
+    font-weight: bold;
+    margin-right: 10px;
+  }
+  
+  #month-selector {
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .debt-table {
+    border-collapse: collapse;
+    width: 100%;
+    border: 1px solid #ddd;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .debt-table thead {
+    background-color: #4caf50;
+    color: white;
+  }
+  
+  .debt-table th,
+  .debt-table td {
+    text-align: right;
+    padding: 12px 8px;
+  }
+
+  .debt-table th:first-child,
+.debt-table td:first-child {
+  text-align: left;
+}
+  
+.debt-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .debt-table tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  .debt-table th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    font-weight: bold;
+  }
+  
+  .totals-row {
+    background-color: #e0f3ff; /* Fondo diferente para totales */
+    font-weight: bold;
+  }
+
+  .totals-row td {
+    color: #333; /* Texto oscuro para totales */
+  }
+  
+  .toggle-checkbox {
+    appearance: none;
+    width: 40px;
+    height: 20px;
+    background: #ccc;
+    border-radius: 999px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  
+  .toggle-checkbox:checked {
+    background: #4caf50;
+  }
+  
+  .toggle-checkbox::after {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    background: white;
+    border-radius: 999px;
+    top: 1px;
+    left: 1px;
+    transition: transform 0.2s;
+  }
+  
+  .selectedMonth {
+    background-color: rgba(128, 128, 128, 0.1); /* Gris claro */
+    font-weight: bold;
+  }
+
+  .toggle-checkbox:checked::after {
+    transform: translateX(20px);
+  }
+
+  input {
+    text-align: right; /* Alinear el texto a la derecha */
+    font-size: 0.875rem; /* Fuente más pequeña (14px) */
+  }
+  
+  input:disabled {
+    background-color: #f5f5f5; /* Fondo gris claro para inputs deshabilitados */
+    cursor: not-allowed; /* Cursor no permitido */
+    color: #a0a0a0; /* Texto tenue */
+  }
+
+  
+  

@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #f5f7fb; /* Fondo suave */
+  color: #333; /* Texto oscuro */
+}
+
+table {
+  font-size: 14px; /* Tamaño de fuente más elegante */
+}
+
+.debt-table th {
+  background-color: #4a90e2; /* Azul más suave */
+  color: white;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.debt-table td {
+  color: #555; /* Texto más oscuro para contraste */
+}
+
+.totals-row {
+  background-color: #e8f4ff; /* Azul claro para la fila de totales */
+  font-weight: bold;
+}
