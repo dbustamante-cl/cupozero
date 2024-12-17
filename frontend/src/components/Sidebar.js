@@ -51,9 +51,11 @@ function Sidebar({ selectedAccount, setSelectedAccount, setShowCardAdmin, stores
       {/* Header */}
       <div className="p-4 font-bold text-xl flex items-center justify-between">
         {!isCollapsed && (
-          <div className="rounded-full bg-gray-800 w-10 h-10 flex items-center justify-center text-white">
-            cZ
-          </div>
+          <img
+          src="/logo-creditix.png" // Reemplaza esta ruta con la de tu imagen (ej: public/creditix.png)
+          alt="Logo"
+          className="w-32" // Ajusta el tamaño de la imagen según tu diseño
+        />
         )}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
